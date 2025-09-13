@@ -4,146 +4,139 @@ import java.util.Scanner;
 
 public class CadastroVeiculos {
     static Scanner scan = new Scanner(System.in);
-
     static List<Veiculo> veiculos = new ArrayList<>();
 
     public static void main(String[] args) {
         String menu = """
-                \n===Bem Vindo ao Controle de Frotas ===
+                \n=== Bem Vindo ao Controle de Frotas ===
                 1 - Cadastro de Veículos
                 2 - Listar Veículos
                 3 - Excluir Veículo
                 4 - Pesquisar Veículo
                 0 - Sair
                 """;
+
         int opcao;
         do {
             System.out.println(menu);
             opcao = Input.scanInt("Digite uma opção: ", scan);
+
             try {
                 switch (opcao) {
-                    case 1:
-                        CadastroVeiculos.cadastrarVeiculo();
-                        break;
-                    case 2:
-                        CadastroVeiculos.listarVeiculos();
-                        break;
-                    case 3:
-                        CadastroVeiculos.removerVeiculo();
-                        break;
-                    case 4:
-                        Veiculo pesquisaResultado = CadastroVeiculos.pesquisarVeiculo();
-                        if (pesquisaResultado != null) {
-                            System.out.println(pesquisaResultado);
-                            break;
-                        }
-                        System.out.println("Nenhum veículo encontrado");
-                        break;
-                    case 0:
-                        System.out.println("Saindo...");
-                        break;
-
-                    default:
-                        break;
+                    case 1 -> cadastrarVeiculo();
+                    case 2 -> listarVeiculos();
+                    case 3 -> removerVeiculo();
+                    case 4 -> pesquisarVeiculo();
+                    case 0 -> System.out.println("Saindo...");
+                    default -> System.out.println("Opção inválida.");
                 }
             } catch (Exception e) {
-                System.out.println(e);
+                System.out.println("Erro: " + e.getMessage());
             }
         } while (opcao != 0);
     }
 
     static void cadastrarVeiculo() {
-        System.out.println("Cadastro de Veículo");
+        System.out.println("\n=== Cadastro de Veículo ===");
+        String marca = Input.scanString("Digite a marca: ", scan);
+        String modelo = Input.scanString("Digite o modelo: ", scan);
+        int ano = Input.scanInt("Digite o ano: ", scan);
+        String placa = Input.scanString("Digite a placa (ABC-1234): ", scan);
 
-        String marcaVeiculo = Input.scanString("Digite a marca do veículo: ", scan);
-        String modeloVeiculo = Input.scanString("Digite o modelo do veículo: ", scan);
-        int anoVeiculo = Input.scanInt("Digite o ano do veículo: ", scan);
-        String placaVeiculo = Input.scanString("Digite a placa do veículo (ABC-1234): ", scan);
+        if (pesquisarPlaca(placa) != null) {
+            System.out.println("Erro: já existe um veículo com essa placa!");
+            return;
+        }
 
-        Veiculo novoVeiculo = new Veiculo(marcaVeiculo, modeloVeiculo, anoVeiculo, placaVeiculo);
-        veiculos.add(novoVeiculo);
+        Veiculo novo = new Veiculo(marca, modelo, ano, placa);
+        veiculos.add(novo);
+        System.out.println("Veículo cadastrado com sucesso!");
     }
 
     static void listarVeiculos() {
-        System.out.println("Veículos cadastrados");
-        int i = 1;
-        for (Veiculo veiculo : veiculos) {
-            System.out.println(i++ + " - " + veiculo);
-        }
-    }
-
-    static void removerVeiculo() {
-        listarVeiculos();
-        String removerVeiculoPlaca = Input.scanString(("Remover veículo pela placa: "), scan);
-        Veiculo resultadoPlacaPesquisada = pesquisarPlaca(removerVeiculoPlaca);
-        if(resultadoPlacaPesquisada != null){
-            for(int i = 0; i < veiculos.size(); i++){
-                if(resultadoPlacaPesquisada == veiculos.get(i)){
-                    veiculos.remove(i);
-                    System.out.println("Veículo removido");
-                    break;
-                }
+        System.out.println("\n=== Veículos Cadastrados ===");
+        if (veiculos.isEmpty()) {
+            System.out.println("Nenhum veículo cadastrado.");
+        } else {
+            for (int i = 0; i < veiculos.size(); i++) {
+                System.out.println((i + 1) + " - " + veiculos.get(i));
             }
         }
     }
 
-    static Veiculo pesquisarVeiculo() {
-        if (veiculos.size() == 0) {
-            System.out.println("Nenhum veículo cadastrado");
-            return null;
+    static void removerVeiculo() {
+        System.out.println("\n=== Remover Veículo ===");
+        String placa = Input.scanString("Digite a placa do veículo: ", scan);
+        Veiculo veiculo = pesquisarPlaca(placa);
+
+        if (veiculo != null) {
+            veiculos.remove(veiculo);
+            System.out.println("Veículo removido com sucesso!");
+        } else {
+            System.out.println("Erro: veículo não encontrado.");
+        }
+    }
+
+    static void pesquisarVeiculo() {
+        if (veiculos.isEmpty()) {
+            System.out.println("Nenhum veículo cadastrado.");
+            return;
         }
 
         String menuPesquisa = """
                 \n=== Pesquisa de Veículos ===
                 1 - Por Placa
                 2 - Por Modelo
-                0 - Sair
+                0 - Voltar
                 """;
-
         System.out.println(menuPesquisa);
-        int opcao = Input.scanInt("Opção: ", scan);
 
-        return switch (opcao) {
-            case 1:
-                String placaPesquisa = Input.scanString("Pesquisa por placa: ", scan);
-                Veiculo resultadoPlacaPesquisada = pesquisarPlaca(placaPesquisa);
-                if (resultadoPlacaPesquisada != null) {
-                    yield resultadoPlacaPesquisada;
+        int opcao = Input.scanInt("Digite uma opção: ", scan);
+
+        switch (opcao) {
+            case 1 -> {
+                String placa = Input.scanString("Digite a placa: ", scan);
+                Veiculo v = pesquisarPlaca(placa);
+                if (v != null) {
+                    System.out.println("Veículo encontrado: " + v);
+                } else {
+                    System.out.println("Nenhum veículo encontrado.");
                 }
-                yield null;
-            case 2:
-
-                String modeloPesquisa = Input.scanString("Pesquisa por modelo: ", scan);
-                Veiculo resultadoModeloPesquisado = pesquisarModelo(modeloPesquisa);
-                if (resultadoModeloPesquisado != null) {
-                    yield resultadoModeloPesquisado;
+            }
+            case 2 -> {
+                String modelo = Input.scanString("Digite parte do modelo: ", scan);
+                List<Veiculo> encontrados = pesquisarModelo(modelo);
+                if (!encontrados.isEmpty()) {
+                    System.out.println("Veículos encontrados:");
+                    for (Veiculo v : encontrados) {
+                        System.out.println(v);
+                    }
+                } else {
+                    System.out.println("Nenhum veículo encontrado.");
                 }
-                yield null;
-            case 0:
-                System.out.println("Saindo...");
-                yield null;
-
-            default:
-                System.out.println("Inválido...");
-                yield null;
-        };
+            }
+            case 0 -> System.out.println("Voltando...");
+            default -> System.out.println("Opção inválida.");
+        }
     }
 
-    private static Veiculo pesquisarPlaca(String placaProcurada) {
-        for (Veiculo veiculo : veiculos) {
-            if (veiculo.getPlaca().equalsIgnoreCase(placaProcurada)) {
-                return veiculo;
+    private static Veiculo pesquisarPlaca(String placa) {
+        for (Veiculo v : veiculos) {
+            if (v.getPlaca().equalsIgnoreCase(placa)) {
+                return v;
             }
         }
         return null;
     }
 
-    private static Veiculo pesquisarModelo(String modeloProcurada) {
-        for (Veiculo veiculo : veiculos) {
-            if (veiculo.getModelo().toUpperCase().contains(modeloProcurada.toUpperCase())) {
-                return veiculo;
+    private static List<Veiculo> pesquisarModelo(String modelo) {
+        List<Veiculo> encontrados = new ArrayList<>();
+        for (Veiculo v : veiculos) {
+            if (v.getModelo().toLowerCase().contains(modelo.toLowerCase())) {
+                encontrados.add(v);
             }
         }
-        return null;
+        return encontrados;
     }
 }
+

@@ -4,16 +4,15 @@ public class Veiculo {
     private int ano;
     private String placa;
 
-    public  Veiculo(){}
+    public Veiculo() {}
 
-    public Veiculo(String marca, String modelo, int ano, String placa){
+    public Veiculo(String marca, String modelo, int ano, String placa) {
         this.marca = marca;
         this.modelo = modelo;
         this.ano = ano;
         this.placa = placa;
     }
 
-    
     public String getMarca() {
         return marca;
     }
@@ -48,6 +47,9 @@ public class Veiculo {
 
     @Override
     public String toString() {
-        return marca + " " + modelo +  ", Placa " + placa + ", Ano - " + ano;
+        return "Marca: " + marca +
+                ", Modelo: " + modelo +
+                ", Ano: " + ano +
+                ", Placa: " + placa;
     }
 }
